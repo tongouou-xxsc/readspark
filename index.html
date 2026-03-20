@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ReadSpark – English Reading for Kids</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Fredoka+One&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sky: #e8f4fd;
+    --blue: #3b82f6;
+    --blue-dark: #1d4ed8;
+    --green: #22c55e;
+    --green-dark: #16a34a;
+    --orange: #f97316;
+    --red: #ef4444;
+    --yellow: #fbbf24;
+    --purple: #8b5cf6;
+    --pink: #ec4899;
+    --bg: #f0f7ff;
+    --card: #ffffff;
+    --text: #1e293b;
+    --muted: #64748b;
+    --radius: 20px;
+    --shadow: 0 4px 24px rgba(59,130,246,0.12);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    background-image: radial-gradient(circle at 20% 20%, #dbeafe 0%, transparent 50%),
+                      radial-gradient(circle at 80% 80%, #fde8ff 0%, transparent 50%);
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: white;
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .logo {
+    font-family: 'Fredoka One', cursive;
+    font-size: 28px;
+    color: var(--blue);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .logo span { font-size: 32px; }
+  .header-right { display: flex; gap: 12px; align-items: center; }
+  .btn-history {
+    background: var(--purple);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 50px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex; align-items: center; gap: 6px;
+    transition: transform .15s, box-shadow .15s;
+  }
+  .btn-history:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(139,92,246,0.4); }
+
+  /* ── MAIN LAYOUT ── */
+  main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 32px 20px 60px;
+  }
+
+  /* ── TOPIC SELECTOR ── */
+  .topic-section { text-align: center; margin-bottom: 32px; }
+  .topic-section h2 { font-size: 24px; font-weight: 800; color: var(--blue-dark); margin-bottom: 6px; }
+  .topic-section p { color: var(--muted); font-size: 15px; margin-bottom: 20px; }
+  .topics-grid {
+    display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;
+  }
+  .topic-btn {
+    background: white;
+    border: 2.5px solid #e2e8f0;
+    border-radius: 50px;
+    padding: 10px 20px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    cursor: pointer;
+    display: flex; align-items: center; gap: 8px;
+    transition: all .2s;
+    color: var(--text);
+  }
+  .topic-btn:hover, .topic-btn.active {
+    border-color: var(--blue);
+    background: #eff6ff;
+    color: var(--blue);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(59,130,246,0.2);
+  }
+  .btn-generate {
+    margin-top: 20px;
+    background: linear-gradient(135deg, var(--blue), var(--purple));
+    color: white;
+    border: none;
+    padding: 14px 36px;
+    border-radius: 50px;
+    font-family: 'Fredoka One', cursive;
+    font-size: 20px;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(59,130,246,0.35);
+    transition: transform .2s, box-shadow .2s;
+    display: inline-flex; align-items: center; gap: 10px;
+  }
+  .btn-generate:hover:not(:disabled) { transform: translateY(-3px); box-shadow: 0 8px 28px rgba(59,130,246,0.45); }
+  .btn-generate:disabled { opacity: .6; cursor: not-allowed; }
+
+  /* ── LOADING ── */
+  #loading-section { display: none; text-align: center; padding: 60px 20px; }
+  .loader {
+    width: 64px; height: 64px;
+    border: 6px solid #dbeafe;
+    border-top-color: var(--blue);
+    border-radius: 50%;
+    animation: spin 0.9s linear infinite;
+    margin: 0 auto 20px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  #loading-section p { color: var(--muted); font-size: 16px; font-weight: 600; }
+
+  /* ── ARTICLE CARD ── */
+  #article-section { display: none; }
+  .article-card {
+    background: white;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+  .article-header {
+    background: linear-gradient(135deg, #1d4ed8, #7c3aed);
+    padding: 20px 28px;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  .article-header h1 { font-size: 22px; font-weight: 800; line-height: 1.3; }
+  .article-meta { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+  .badge {
+    background: rgba(255,255,255,0.2);
+    padding: 4px 10px;
+    border-radius: 50px;
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .controls-bar {
+    display: flex; gap: 8px; flex-shrink: 0; align-items: center;
+  }
+  .ctrl-btn {
+    background: rgba(255,255,255,0.2);
+    border: 2px solid rgba(255,255,255,0.4);
+    color: white;
+    border-radius: 50px;
+    padding: 8px 14px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    display: flex; align-items: center; gap: 6px;
+    transition: background .2s;
+    white-space: nowrap;
+  }
+  .ctrl-btn:hover { background: rgba(255,255,255,0.35); }
+  .ctrl-btn.speaking { background: rgba(251,191,36,0.4); border-color: var(--yellow); }
+
+  /* timer */
+  .timer-bar {
+    background: #f8fafc;
+    padding: 10px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #e2e8f0;
+  }
+  .timer-display {
+    font-family: 'Fredoka One', cursive;
+    font-size: 22px;
+    color: var(--blue);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .timer-label { font-size: 13px; color: var(--muted); font-weight: 600; }
+
+  .article-body { padding: 28px; line-height: 1.9; font-size: 17px; }
+  .article-body p { margin-bottom: 14px; }
+
+  /* vocab highlight */
+  .vocab-word {
+    cursor: pointer;
+    border-bottom: 2px dashed var(--blue);
+    color: var(--blue-dark);
+    font-weight: 700;
+    position: relative;
+    transition: background .15s;
+    padding: 0 2px;
+    border-radius: 3px;
+  }
+  .vocab-word:hover { background: #dbeafe; }
+
+  /* tooltip */
+  .tooltip {
+    position: fixed;
+    background: #1e293b;
+    color: white;
+    padding: 10px 16px;
+    border-radius: 12px;
+    font-size: 14px;
+    max-width: 260px;
+    z-index: 999;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity .2s;
+    line-height: 1.5;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  }
+  .tooltip.visible { opacity: 1; }
+  .tooltip strong { color: var(--yellow); font-size: 15px; display: block; margin-bottom: 4px; }
+
+  /* ── QUIZ ── */
+  #quiz-section { display: none; }
+  .quiz-header {
+    text-align: center;
+    margin-bottom: 28px;
+  }
+  .quiz-header h2 { font-family: 'Fredoka One', cursive; font-size: 28px; color: var(--blue-dark); }
+  .quiz-header p { color: var(--muted); font-size: 15px; margin-top: 6px; }
+
+  .progress-bar-outer {
+    background: #e2e8f0;
+    height: 8px;
+    border-radius: 99px;
+    margin: 16px 0 28px;
+    overflow: hidden;
+  }
+  .progress-bar-inner {
+    height: 100%;
+    background: linear-gradient(90deg, var(--blue), var(--purple));
+    border-radius: 99px;
+    transition: width .4s ease;
+  }
+
+  .question-card {
+    background: white;
+    border-radius: var(--radius);
+    padding: 28px;
+    box-shadow: var(--shadow);
+    margin-bottom: 20px;
+  }
+  .q-number { font-size: 12px; font-weight: 800; color: var(--purple); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+  .q-text { font-size: 18px; font-weight: 700; line-height: 1.4; margin-bottom: 20px; color: var(--text); }
+  .options { display: flex; flex-direction: column; gap: 10px; }
+  .option-btn {
+    background: #f8fafc;
+    border: 2.5px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 14px 18px;
+    text-align: left;
+    font-family: 'Nunito', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .2s;
+    display: flex; align-items: center; gap: 12px;
+    color: var(--text);
+  }
+  .option-btn:hover:not(:disabled) {
+    border-color: var(--blue);
+    background: #eff6ff;
+    transform: translateX(4px);
+  }
+  .option-label {
+    width: 30px; height: 30px;
+    background: #e2e8f0;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800;
+    font-size: 13px;
+    flex-shrink: 0;
+    transition: all .2s;
+  }
+  .option-btn.correct { border-color: var(--green); background: #f0fdf4; color: var(--green-dark); }
+  .option-btn.correct .option-label { background: var(--green); color: white; }
+  .option-btn.wrong { border-color: var(--red); background: #fff5f5; color: var(--red); }
+  .option-btn.wrong .option-label { background: var(--red); color: white; }
+  .option-btn.disabled-opt { opacity: .55; cursor: not-allowed; }
+
+  .explanation {
+    margin-top: 14px;
+    padding: 12px 16px;
+    background: #f0fdf4;
+    border-left: 4px solid var(--green);
+    border-radius: 10px;
+    font-size: 14px;
+    color: #166534;
+    font-weight: 600;
+    display: none;
+  }
+  .explanation.show { display: block; }
+  .explanation.wrong-exp { background: #fff5f5; border-color: var(--red); color: #991b1b; }
+
+  .quiz-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 8px;
+  }
+  .btn-next {
+    background: linear-gradient(135deg, var(--green), #16a34a);
+    color: white;
+    border: none;
+    padding: 12px 28px;
+    border-radius: 50px;
+    font-family: 'Fredoka One', cursive;
+    font-size: 18px;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(34,197,94,0.35);
+    transition: transform .2s;
+    display: none;
+  }
+  .btn-next:hover { transform: translateY(-2px); }
+  .btn-submit {
+    background: linear-gradient(135deg, var(--orange), #dc2626);
+    color: white;
+    border: none;
+    padding: 12px 28px;
+    border-radius: 50px;
+    font-family: 'Fredoka One', cursive;
+    font-size: 18px;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(249,115,22,0.35);
+    transition: transform .2s;
+    display: none;
+  }
+  .btn-submit:hover { transform: translateY(-2px); }
+
+  /* ── RESULTS ── */
+  #result-section { display: none; text-align: center; }
+  .result-card {
+    background: white;
+    border-radius: var(--radius);
+    padding: 40px 32px;
+    box-shadow: var(--shadow);
+    margin-bottom: 24px;
+  }
+  .score-circle {
+    width: 140px; height: 140px;
+    border-radius: 50%;
+    margin: 0 auto 20px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    font-family: 'Fredoka One', cursive;
+    position: relative;
+  }
+  .score-circle.great { background: linear-gradient(135deg, var(--green), #16a34a); color: white; }
+  .score-circle.ok { background: linear-gradient(135deg, var(--orange), var(--yellow)); color: white; }
+  .score-circle.low { background: linear-gradient(135deg, var(--red), var(--orange)); color: white; }
+  .score-num { font-size: 48px; line-height: 1; }
+  .score-denom { font-size: 16px; opacity: .8; }
+  .result-emoji { font-size: 56px; margin-bottom: 12px; }
+  .result-title { font-family: 'Fredoka One', cursive; font-size: 32px; margin-bottom: 8px; }
+  .result-sub { color: var(--muted); font-size: 15px; margin-bottom: 24px; }
+  .result-stats {
+    display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-bottom: 28px;
+  }
+  .stat-pill {
+    background: #f8fafc;
+    border: 2px solid #e2e8f0;
+    border-radius: 50px;
+    padding: 10px 18px;
+    font-size: 14px;
+    font-weight: 700;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .result-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .btn-action {
+    padding: 12px 28px;
+    border-radius: 50px;
+    font-family: 'Fredoka One', cursive;
+    font-size: 18px;
+    cursor: pointer;
+    border: none;
+    transition: transform .2s, box-shadow .2s;
+  }
+  .btn-action:hover { transform: translateY(-2px); }
+  .btn-action.blue { background: linear-gradient(135deg, var(--blue), var(--purple)); color: white; box-shadow: 0 4px 16px rgba(59,130,246,0.35); }
+  .btn-action.green { background: linear-gradient(135deg, var(--green), #16a34a); color: white; box-shadow: 0 4px 16px rgba(34,197,94,0.35); }
+
+  /* ── HISTORY MODAL ── */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(15,23,42,0.6);
+    backdrop-filter: blur(4px);
+    z-index: 200;
+    display: none; align-items: center; justify-content: center;
+    padding: 20px;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: white;
+    border-radius: var(--radius);
+    width: 100%; max-width: 560px;
+    max-height: 80vh;
+    overflow-y: auto;
+    padding: 28px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+  }
+  .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+  .modal-header h3 { font-family: 'Fredoka One', cursive; font-size: 22px; color: var(--blue-dark); }
+  .btn-close { background: none; border: none; font-size: 24px; cursor: pointer; color: var(--muted); }
+  .history-empty { text-align: center; color: var(--muted); padding: 40px; font-size: 15px; }
+  .history-item {
+    border: 2px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .history-item-left .h-title { font-weight: 700; font-size: 14px; }
+  .history-item-left .h-meta { font-size: 12px; color: var(--muted); margin-top: 3px; }
+  .score-badge {
+    font-family: 'Fredoka One', cursive;
+    font-size: 20px;
+    padding: 6px 14px;
+    border-radius: 50px;
+    color: white;
+  }
+  .score-badge.great { background: var(--green); }
+  .score-badge.ok { background: var(--orange); }
+  .score-badge.low { background: var(--red); }
+
+  /* ── START SCREEN ── */
+  #start-section { text-align: center; padding: 20px 0 40px; }
+  .hero { margin-bottom: 40px; }
+  .hero-emoji { font-size: 80px; display: block; margin-bottom: 16px; animation: bounce 2s infinite; }
+  @keyframes bounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+  .hero h1 { font-family: 'Fredoka One', cursive; font-size: 42px; color: var(--blue-dark); line-height: 1.1; margin-bottom: 10px; }
+  .hero p { font-size: 17px; color: var(--muted); max-width: 480px; margin: 0 auto; }
+  .features { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin: 32px 0; }
+  .feature-chip {
+    background: white;
+    border-radius: 14px;
+    padding: 14px 18px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    font-size: 14px;
+    font-weight: 700;
+    display: flex; align-items: center; gap: 8px;
+    color: var(--text);
+  }
+
+  /* ── RESPONSIVE ── */
+  @media(max-width: 600px) {
+    .article-header { flex-direction: column; }
+    .controls-bar { width: 100%; justify-content: flex-start; flex-wrap: wrap; }
+    .hero h1 { font-size: 32px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo"><span>📚</span> ReadSpark</div>
+  <div class="header-right">
+    <button class="btn-history" onclick="openHistory()">🏆 My Scores</button>
+  </div>
+</header>
+
+<!-- TOOLTIP -->
+<div class="tooltip" id="tooltip">
+  <strong id="tooltip-word"></strong>
+  <span id="tooltip-def"></span>
+</div>
+
+<!-- HISTORY MODAL -->
+<div class="modal-overlay" id="history-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>🏆 Score History</h3>
+      <button class="btn-close" onclick="closeHistory()">✕</button>
+    </div>
+    <div id="history-list"></div>
+  </div>
+</div>
+
+<main>
+
+<!-- ── START SECTION ── -->
+<div id="start-section">
+  <div class="hero">
+    <span class="hero-emoji">🌟</span>
+    <h1>English Reading Adventure!</h1>
+    <p>Read AI-created stories, learn new words, and test your understanding. Made for Grade 3–4 readers.</p>
+  </div>
+  <div class="features">
+    <div class="feature-chip">🤖 AI Stories</div>
+    <div class="feature-chip">⏱️ Reading Timer</div>
+    <div class="feature-chip">🔊 Listen & Read</div>
+    <div class="feature-chip">💡 Tap to Learn Words</div>
+    <div class="feature-chip">🏆 Track Your Scores</div>
+  </div>
+
+  <div class="topic-section">
+    <h2>Choose a Topic</h2>
+    <p>What would you like to read about today?</p>
+    <div class="topics-grid" id="topics-grid"></div>
+    <br>
+    <button class="btn-generate" id="gen-btn" onclick="generateArticle()">
+      ✨ Generate My Story!
+    </button>
+  </div>
+</div>
+
+<!-- ── LOADING ── -->
+<div id="loading-section">
+  <div class="loader"></div>
+  <p id="loading-msg">Creating your story…</p>
+</div>
+
+<!-- ── ARTICLE ── -->
+<div id="article-section">
+  <div class="article-card">
+    <div class="article-header">
+      <div>
+        <h1 id="article-title">Title</h1>
+        <div class="article-meta">
+          <span class="badge" id="badge-topic">🌿 Nature</span>
+          <span class="badge">Grade 3–4</span>
+          <span class="badge" id="badge-words">~0 words</span>
+        </div>
+      </div>
+      <div class="controls-bar">
+        <button class="ctrl-btn" id="tts-btn" onclick="toggleTTS()">🔊 Read Aloud</button>
+        <button class="ctrl-btn" onclick="startQuiz()">📝 Take Quiz</button>
+      </div>
+    </div>
+    <div class="timer-bar">
+      <div class="timer-display">⏱️ <span id="timer-display">0:00</span></div>
+      <div class="timer-label">Reading Time</div>
+    </div>
+    <div class="article-body" id="article-body"></div>
+  </div>
+  <div style="text-align:center; margin-top: -8px; margin-bottom: 20px;">
+    <p style="color: var(--muted); font-size:14px;">💡 <strong>Tap any underlined word</strong> to see its meaning!</p>
+  </div>
+  <div style="text-align:center;">
+    <button class="btn-generate" onclick="startQuiz()">📝 I'm Ready — Take the Quiz!</button>
+  </div>
+</div>
+
+<!-- ── QUIZ ── -->
+<div id="quiz-section">
+  <div class="quiz-header">
+    <h2>📝 Reading Quiz</h2>
+    <p id="quiz-subtitle">Let's see what you understood!</p>
+  </div>
+  <div class="progress-bar-outer">
+    <div class="progress-bar-inner" id="progress-bar" style="width:0%"></div>
+  </div>
+  <div id="questions-container"></div>
+  <div class="quiz-nav">
+    <div style="font-size:14px; color:var(--muted); font-weight:600;" id="q-counter"></div>
+    <div style="display:flex; gap:10px;">
+      <button class="btn-next" id="btn-next" onclick="nextQuestion()">Next ➜</button>
+      <button class="btn-submit" id="btn-submit" onclick="submitQuiz()">Submit Quiz 🎉</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── RESULTS ── -->
+<div id="result-section">
+  <div class="result-card">
+    <div class="result-emoji" id="result-emoji"></div>
+    <div class="score-circle" id="score-circle">
+      <div class="score-num" id="score-num"></div>
+      <div class="score-denom" id="score-denom"></div>
+    </div>
+    <div class="result-title" id="result-title"></div>
+    <div class="result-sub" id="result-sub"></div>
+    <div class="result-stats" id="result-stats"></div>
+    <div class="result-actions">
+      <button class="btn-action blue" onclick="goHome()">🏠 New Story</button>
+      <button class="btn-action green" onclick="reviewQuiz()">👀 Review Answers</button>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<script>
+// ─────────────────────────────────────────────
+// DATA
+// ─────────────────────────────────────────────
+const TOPICS = [
+  { emoji: '🦁', label: 'Animals', key: 'animals' },
+  { emoji: '🚀', label: 'Space', key: 'space' },
+  { emoji: '🌊', label: 'Ocean', key: 'ocean' },
+  { emoji: '🦕', label: 'Dinosaurs', key: 'dinosaurs' },
+  { emoji: '🌿', label: 'Nature', key: 'nature' },
+  { emoji: '🏙️', label: 'Cities', key: 'cities' },
+  { emoji: '🍎', label: 'Food & Health', key: 'food and health' },
+  { emoji: '⚽', label: 'Sports', key: 'sports' },
+  { emoji: '🤖', label: 'Technology', key: 'technology' },
+  { emoji: '🏰', label: 'History', key: 'history' },
+  { emoji: '🌍', label: 'Countries', key: 'world cultures' },
+  { emoji: '🎨', label: 'Art & Music', key: 'art and music' },
+];
+
+let selectedTopic = TOPICS[0];
+let currentArticle = null;
+let currentQuestions = [];
+let currentQIndex = 0;
+let userAnswers = [];
+let timerInterval = null;
+let timerSeconds = 0;
+let readingTime = 0;
+let speechSynth = window.speechSynthesis;
+let currentUtterance = null;
+let isSpeaking = false;
+let history = JSON.parse(localStorage.getItem('readspark_history') || '[]');
+
+// ─────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────
+function init() {
+  const grid = document.getElementById('topics-grid');
+  TOPICS.forEach((t, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'topic-btn' + (i === 0 ? ' active' : '');
+    btn.innerHTML = `${t.emoji} ${t.label}`;
+    btn.onclick = () => selectTopic(t, btn);
+    grid.appendChild(btn);
+  });
+}
+
+function selectTopic(t, btn) {
+  selectedTopic = t;
+  document.querySelectorAll('.topic-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+// ─────────────────────────────────────────────
+// GENERATE
+// ─────────────────────────────────────────────
+async function generateArticle() {
+  showSection('loading');
+  const msgs = [
+    `Writing a ${selectedTopic.label} story just for you…`,
+    'Picking interesting vocabulary…',
+    'Crafting quiz questions…',
+    'Almost ready!'
+  ];
+  let mi = 0;
+  const msgEl = document.getElementById('loading-msg');
+  const msgInt = setInterval(() => { msgEl.textContent = msgs[Math.min(++mi, msgs.length - 1)]; }, 1800);
+
+  try {
+    const prompt = `You are a children's reading teacher. Create an engaging English reading passage and quiz for Grade 3-4 students (ages 8-10).
+
+Topic: ${selectedTopic.label}
+
+Respond ONLY with a valid JSON object (no markdown, no backticks) in this exact format:
+{
+  "title": "...",
+  "topic": "${selectedTopic.label}",
+  "body": "3-4 paragraphs, ~200-280 words total, separated by \\n\\n. Use engaging, age-appropriate language. Include 6-8 vocabulary words that are slightly challenging for Grade 3-4.",
+  "vocab": [
+    {"word": "...", "definition": "Simple kid-friendly definition (1 sentence)"},
+    ...6-8 words total
+  ],
+  "questions": [
+    {
+      "question": "...",
+      "options": ["A. ...", "B. ...", "C. ...", "D. ..."],
+      "answer": 0,
+      "explanation": "Brief explanation of why this is correct (1-2 sentences, friendly tone)"
+    },
+    ...5 questions total
+  ]
+}
+
+Guidelines:
+- Body must be fun, vivid, educational and appropriate for Grade 3-4
+- Questions should test comprehension, inference, and vocabulary (mix of types)
+- answer is 0-indexed (0=A, 1=B, 2=C, 3=D)
+- Make distractors plausible but clearly wrong
+- explanation should be encouraging and educational`;
+
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await resp.json();
+    clearInterval(msgInt);
+
+    const raw = data.content.filter(b => b.type === 'text').map(b => b.text).join('');
+    let parsed;
+    try {
+      parsed = JSON.parse(raw.replace(/```json|```/g, '').trim());
+    } catch(e) {
+      // Try to extract JSON from response
+      const match = raw.match(/\{[\s\S]*\}/);
+      if (match) parsed = JSON.parse(match[0]);
+      else throw new Error('Could not parse response');
+    }
+
+    currentArticle = parsed;
+    currentQuestions = parsed.questions;
+    renderArticle(parsed);
+    showSection('article');
+    startTimer();
+
+  } catch (err) {
+    clearInterval(msgInt);
+    console.error(err);
+    alert('Oops! Something went wrong. Please try again.');
+    showSection('start');
+  }
+}
+
+// ─────────────────────────────────────────────
+// ARTICLE RENDER
+// ─────────────────────────────────────────────
+function renderArticle(data) {
+  document.getElementById('article-title').textContent = data.title;
+  document.getElementById('badge-topic').textContent = `${selectedTopic.emoji} ${data.topic}`;
+
+  const bodyEl = document.getElementById('article-body');
+  let html = '';
+  const vocabMap = {};
+  (data.vocab || []).forEach(v => { vocabMap[v.word.toLowerCase()] = v.definition; });
+
+  const paragraphs = data.body.split(/\n\n+/);
+  paragraphs.forEach(para => {
+    if (!para.trim()) return;
+    const words = para.split(/(\s+)/);
+    let paraHtml = '';
+    words.forEach(token => {
+      const clean = token.replace(/[^a-zA-Z'-]/g, '').toLowerCase();
+      if (vocabMap[clean]) {
+        paraHtml += `<span class="vocab-word" data-word="${token.replace(/[^a-zA-Z'-]/g,'')}" data-def="${vocabMap[clean]}">${token}</span>`;
+      } else {
+        paraHtml += token;
+      }
+    });
+    html += `<p>${paraHtml}</p>`;
+  });
+  bodyEl.innerHTML = html;
+
+  const wordCount = data.body.split(/\s+/).length;
+  document.getElementById('badge-words').textContent = `~${wordCount} words`;
+
+  // tooltip events
+  bodyEl.querySelectorAll('.vocab-word').forEach(el => {
+    el.addEventListener('mouseover', showTooltip);
+    el.addEventListener('mousemove', moveTooltip);
+    el.addEventListener('mouseleave', hideTooltip);
+    el.addEventListener('click', showTooltip);
+  });
+}
+
+// ─────────────────────────────────────────────
+// TOOLTIP
+// ─────────────────────────────────────────────
+const tooltip = document.getElementById('tooltip');
+function showTooltip(e) {
+  const el = e.currentTarget;
+  document.getElementById('tooltip-word').textContent = el.dataset.word;
+  document.getElementById('tooltip-def').textContent = el.dataset.def;
+  tooltip.classList.add('visible');
+  positionTooltip(e);
+}
+function moveTooltip(e) { positionTooltip(e); }
+function hideTooltip() { tooltip.classList.remove('visible'); }
+function positionTooltip(e) {
+  let x = e.clientX + 12, y = e.clientY - 10;
+  if (x + 280 > window.innerWidth) x = e.clientX - 280;
+  if (y + 80 > window.innerHeight) y = e.clientY - 80;
+  tooltip.style.left = x + 'px';
+  tooltip.style.top = y + 'px';
+}
+
+// ─────────────────────────────────────────────
+// TIMER
+// ─────────────────────────────────────────────
+function startTimer() {
+  timerSeconds = 0;
+  clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    timerSeconds++;
+    const m = Math.floor(timerSeconds / 60);
+    const s = timerSeconds % 60;
+    document.getElementById('timer-display').textContent = `${m}:${s.toString().padStart(2,'0')}`;
+  }, 1000);
+}
+function stopTimer() {
+  clearInterval(timerInterval);
+  readingTime = timerSeconds;
+}
+
+// ─────────────────────────────────────────────
+// TTS
+// ─────────────────────────────────────────────
+function toggleTTS() {
+  if (isSpeaking) {
+    speechSynth.cancel();
+    isSpeaking = false;
+    document.getElementById('tts-btn').textContent = '🔊 Read Aloud';
+    document.getElementById('tts-btn').classList.remove('speaking');
+  } else {
+    const text = currentArticle.title + '. ' + currentArticle.body.replace(/\n/g, ' ');
+    currentUtterance = new SpeechSynthesisUtterance(text);
+    currentUtterance.rate = 0.88;
+    currentUtterance.pitch = 1.05;
+    currentUtterance.lang = 'en-US';
+    currentUtterance.onend = () => {
+      isSpeaking = false;
+      document.getElementById('tts-btn').textContent = '🔊 Read Aloud';
+      document.getElementById('tts-btn').classList.remove('speaking');
+    };
+    speechSynth.speak(currentUtterance);
+    isSpeaking = true;
+    document.getElementById('tts-btn').textContent = '⏹ Stop';
+    document.getElementById('tts-btn').classList.add('speaking');
+  }
+}
+
+// ─────────────────────────────────────────────
+// QUIZ
+// ─────────────────────────────────────────────
+function startQuiz() {
+  stopTimer();
+  if (isSpeaking) { speechSynth.cancel(); isSpeaking = false; }
+  currentQIndex = 0;
+  userAnswers = new Array(currentQuestions.length).fill(null);
+  showSection('quiz');
+  renderQuestion(0);
+}
+
+function renderQuestion(idx) {
+  const q = currentQuestions[idx];
+  const total = currentQuestions.length;
+  document.getElementById('q-counter').textContent = `Question ${idx + 1} of ${total}`;
+  document.getElementById('progress-bar').style.width = `${(idx / total) * 100}%`;
+
+  const labels = ['A', 'B', 'C', 'D'];
+  let html = `<div class="question-card">
+    <div class="q-number">Question ${idx + 1}</div>
+    <div class="q-text">${q.question}</div>
+    <div class="options" id="options-${idx}">`;
+  q.options.forEach((opt, i) => {
+    const optText = opt.replace(/^[A-D]\.\s*/,'');
+    html += `<button class="option-btn" id="opt-${idx}-${i}" onclick="selectAnswer(${idx}, ${i})">
+      <span class="option-label">${labels[i]}</span> ${optText}
+    </button>`;
+  });
+  html += `</div>
+    <div class="explanation" id="exp-${idx}"></div>
+  </div>`;
+
+  document.getElementById('questions-container').innerHTML = html;
+  document.getElementById('btn-next').style.display = 'none';
+  document.getElementById('btn-submit').style.display = 'none';
+
+  // Restore previous answer if navigating back
+  if (userAnswers[idx] !== null) {
+    revealAnswer(idx, userAnswers[idx], false);
+  }
+}
+
+function selectAnswer(qIdx, optIdx) {
+  if (userAnswers[qIdx] !== null) return; // already answered
+  userAnswers[qIdx] = optIdx;
+  revealAnswer(qIdx, optIdx, true);
+}
+
+function revealAnswer(qIdx, optIdx, animate) {
+  const q = currentQuestions[qIdx];
+  const correct = q.answer;
+  const options = document.querySelectorAll(`#options-${qIdx} .option-btn`);
+
+  options.forEach((btn, i) => {
+    btn.disabled = true;
+    btn.classList.add('disabled-opt');
+    if (i === correct) btn.classList.add('correct');
+    else if (i === optIdx && optIdx !== correct) btn.classList.add('wrong');
+  });
+
+  const expEl = document.getElementById(`exp-${qIdx}`);
+  const isCorrect = optIdx === correct;
+  expEl.textContent = (isCorrect ? '✅ Correct! ' : '❌ Not quite. ') + q.explanation;
+  expEl.className = 'explanation show' + (isCorrect ? '' : ' wrong-exp');
+
+  const isLast = qIdx === currentQuestions.length - 1;
+  if (isLast) {
+    document.getElementById('btn-submit').style.display = 'inline-flex';
+    document.getElementById('btn-next').style.display = 'none';
+  } else {
+    document.getElementById('btn-next').style.display = 'inline-flex';
+    document.getElementById('btn-submit').style.display = 'none';
+  }
+}
+
+function nextQuestion() {
+  if (currentQIndex < currentQuestions.length - 1) {
+    currentQIndex++;
+    renderQuestion(currentQIndex);
+    document.getElementById('questions-container').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+
+function submitQuiz() {
+  const score = userAnswers.filter((a, i) => a === currentQuestions[i].answer).length;
+  const total = currentQuestions.length;
+  const pct = Math.round(score / total * 100);
+
+  // Save to history
+  const entry = {
+    title: currentArticle.title,
+    topic: selectedTopic.label,
+    score, total,
+    readingTime,
+    date: new Date().toLocaleDateString()
+  };
+  history.unshift(entry);
+  if (history.length > 20) history.pop();
+  localStorage.setItem('readspark_history', JSON.stringify(history));
+
+  showResults(score, total, pct);
+}
+
+// ─────────────────────────────────────────────
+// RESULTS
+// ─────────────────────────────────────────────
+function showResults(score, total, pct) {
+  showSection('result');
+
+  const circle = document.getElementById('score-circle');
+  const level = pct >= 80 ? 'great' : pct >= 60 ? 'ok' : 'low';
+  circle.className = `score-circle ${level}`;
+  document.getElementById('score-num').textContent = score;
+  document.getElementById('score-denom').textContent = `/ ${total}`;
+
+  const msgs = {
+    great: { emoji: '🎉', title: 'Outstanding!', sub: 'You\'re a reading superstar! Amazing comprehension.' },
+    ok:    { emoji: '👍', title: 'Good Job!',    sub: 'Nice work! Keep practicing to get even better.' },
+    low:   { emoji: '💪', title: 'Keep Trying!', sub: 'Reading takes practice. You got this — try again!' }
+  };
+  document.getElementById('result-emoji').textContent = msgs[level].emoji;
+  document.getElementById('result-title').textContent = msgs[level].title;
+  document.getElementById('result-sub').textContent = msgs[level].sub;
+
+  const m = Math.floor(readingTime / 60), s = readingTime % 60;
+  document.getElementById('result-stats').innerHTML = `
+    <div class="stat-pill">⏱️ ${m}:${s.toString().padStart(2,'0')} reading time</div>
+    <div class="stat-pill">✅ ${score}/${total} correct</div>
+    <div class="stat-pill">📊 ${pct}%</div>
+  `;
+  document.getElementById('progress-bar').style.width = '100%';
+}
+
+function reviewQuiz() {
+  showSection('quiz');
+  currentQIndex = 0;
+  renderQuestion(0);
+  // re-reveal all answers that were given
+  userAnswers.forEach((ans, i) => {
+    if (ans !== null && i === 0) revealAnswer(i, ans, false);
+  });
+}
+
+// ─────────────────────────────────────────────
+// HISTORY
+// ─────────────────────────────────────────────
+function openHistory() {
+  const list = document.getElementById('history-list');
+  if (history.length === 0) {
+    list.innerHTML = '<div class="history-empty">📭 No scores yet! Complete a quiz to see your history.</div>';
+  } else {
+    list.innerHTML = history.map(h => {
+      const pct = Math.round(h.score / h.total * 100);
+      const lvl = pct >= 80 ? 'great' : pct >= 60 ? 'ok' : 'low';
+      const m = Math.floor((h.readingTime||0)/60), s = (h.readingTime||0)%60;
+      return `<div class="history-item">
+        <div class="history-item-left">
+          <div class="h-title">${h.title}</div>
+          <div class="h-meta">📚 ${h.topic} &nbsp;·&nbsp; ⏱️ ${m}:${s.toString().padStart(2,'0')} &nbsp;·&nbsp; 📅 ${h.date}</div>
+        </div>
+        <span class="score-badge ${lvl}">${h.score}/${h.total}</span>
+      </div>`;
+    }).join('');
+  }
+  document.getElementById('history-modal').classList.add('open');
+}
+function closeHistory() { document.getElementById('history-modal').classList.remove('open'); }
+document.getElementById('history-modal').addEventListener('click', e => { if (e.target === e.currentTarget) closeHistory(); });
+
+// ─────────────────────────────────────────────
+// SECTION MANAGEMENT
+// ─────────────────────────────────────────────
+function showSection(name) {
+  ['start','loading','article','quiz','result'].forEach(s => {
+    document.getElementById(s + '-section').style.display = 'none';
+  });
+  document.getElementById(name + '-section').style.display = 'block';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function goHome() {
+  stopTimer();
+  if (isSpeaking) { speechSynth.cancel(); isSpeaking = false; }
+  currentArticle = null;
+  currentQuestions = [];
+  showSection('start');
+}
+
+// ─────────────────────────────────────────────
+// START
+// ─────────────────────────────────────────────
+init();
+</script>
+</body>
+</html>
